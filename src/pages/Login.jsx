@@ -36,7 +36,7 @@ function Login() {
   }
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center bg-image bg-cover bg-center bg-[url('@/images/airplaneBG.jpg')]">
+    <div className="w-full min-h-screen flex flex-col justify-start items-center bg-image bg-cover bg-center bg-[url('@/images/airplaneBG.jpg')]">
     <div className="flex flex-col gap-6 w-96 mx-auto mt-20 p-8 border-2 border-slate-300 rounded-lg shadow-lg bg-white">
       {/* Toggle group with proper spacing */}
       <div className="relative flex flex-col items-center mb-6 p-4 bg-slate-100 rounded-lg">

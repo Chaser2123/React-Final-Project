@@ -34,7 +34,7 @@ export default function RootLayout({ children }) {
             <Link href="/" className="font-bold text-lg">Flight Booker</Link>
             <div className="flex gap-5 items-center">
               <Link href="/" className={headerStyles}><FaHome className="text-3xl" /><span>Home</span></Link>
-              <Link href="/about" className={headerStyles}><HiTicket className="text-3xl" /><span>Book A Flight</span></Link>
+              <Link href="/bookflight" className={headerStyles}><HiTicket className="text-3xl" /><span>Book A Flight</span></Link>
               <Link href="/loginpage" className={headerStyles}><FaUserCircle className="text-3xl" /><span>Login In / Sign Up</span></Link>
             </div>
           </header>

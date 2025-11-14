@@ -14,11 +14,23 @@ export default function AuthProvider({ children }) {
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [userRole, setUserRole] = useState("");
 
-    const login = (role) => {
+    const login = (user) => {
+        // Accept either a role string (backwards compatible) or a user object
+        let role = "";
+        let firstName = "";
+        let lastName = "";
+        if (typeof user === 'string') {
+            role = user || 'user';
+        } else if (user && typeof user === 'object') {
+            role = user.role || 'user';
+            firstName = user.firstName || user.name || '';
+            lastName = user.lastName || '';
+        } else {
+            role = 'user';
+        }
         setIsAuthorized(true);
-        setUserRole(role || "");
-        // When logging in, set a basic currentUser object; consumers can replace with richer data
-        setCurrentUser({ role: role || 'user' });
+        setUserRole(role);
+        setCurrentUser({ role, firstName, lastName });
     };
 
     const logout = () => {

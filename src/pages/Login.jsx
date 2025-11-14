@@ -44,7 +44,6 @@ function Login() {
           <Toggle label="Login" index={0} active={toggle} onClick={setToggle} />
           <Toggle label="Sign Up" index={1} active={toggle} onClick={setToggle} />
         </div>
-        {/* Sliding underline indicator */}
         <div
           className="absolute top-0 left-1/4 h-full bg-blue-400 rounded-lg w-1/4 transition-transform duration-400 ease-in-out"
           style={{
@@ -81,7 +80,15 @@ function Login() {
             onClick={() => {
               if (toggle === 0) {
                 console.log("Logging in with", username, password)
-                authLogin('user')
+                // Attempt to retrieve saved user to populate name
+                const existingUser = savedUsers[username] || null;
+                if (existingUser) {
+                  authLogin({ role: existingUser.role || 'user', firstName: existingUser.firstName, lastName: existingUser.lastName });
+                } else {
+                  authLogin({ role: 'user', firstName: username });
+                }
+                // Redirect to home after successful login
+                router.replace('/')
               } else {
                 // Check for existing email, then save new user to localStorage
                 if (savedUsers[email]) {
@@ -102,8 +109,8 @@ function Login() {
                 }
                 localStorage.setItem('users', JSON.stringify(savedUsers))
                 console.log("Signing up with", email, firstName, lastName, password)
-                // Set auth context before navigation so the app recognizes non-guest state
-                authLogin('user')
+                // Set auth context with provided names
+                authLogin({ role: 'user', firstName, lastName })
                 // Navigate back to previous page after successful signup
                 router.back()
               }

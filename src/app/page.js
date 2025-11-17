@@ -1,4 +1,4 @@
-import Image from "next/image";
+import FlightList from "../components/FlightList.jsx";
 
 export default function Home() {
   return (

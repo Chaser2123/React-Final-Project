@@ -1,0 +1,39 @@
+# ----------------------------------------------------
+# Firebase Service Account Credentials (For Admin SDK)
+# WARNING: These keys MUST NOT be exposed to the client-side.
+# ----------------------------------------------------
+
+# The type is usually fixed: 'service_account'
+FIREBASE_ADMIN_TYPE="service_account"
+
+# The unique identifier for your Firebase project.
+FIREBASE_ADMIN_PROJECT_ID="your-project-id"
+
+# The ID of the private key (a unique string).
+FIREBASE_ADMIN_PRIVATE_KEY_ID="a-unique-private-key-id"
+
+# The actual private key. You'll need to replace newlines (\n) with the literal '\n' 
+# if using it in a single-line environment variable, or use a tool to handle it.
+# In a Node.js environment, the literal string is often best:
+FIREBASE_ADMIN_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+
+# The email address for the service account.
+FIREBASE_ADMIN_CLIENT_EMAIL="firebase-adminsdk-xxxxx@your-project-id.iam.gserviceaccount.com"
+
+# The unique client ID for the service account.
+FIREBASE_ADMIN_CLIENT_ID="12345678901234567890"
+
+# The URI for the authentication service.
+FIREBASE_ADMIN_AUTH_URI="https://accounts.google.com/o/oauth2/auth"
+
+# The URI for getting access tokens.
+FIREBASE_ADMIN_TOKEN_URI="https://oauth2.googleapis.com/token"
+
+# The certificate URL for the authentication provider.
+FIREBASE_ADMIN_AUTH_PROVIDER_X509_CERT_URL="https://www.googleapis.com/oauth2/v1/certs"
+
+# The service account's own public certificate URL.
+FIREBASE_ADMIN_CLIENT_X509_CERT_URL="https://www.googleapis.com/robot/v1/metadata/x509/..."
+
+# The domain for the Google Cloud universe.
+FIREBASE_ADMIN_UNIVERSE_DOMAIN="googleapis.com"

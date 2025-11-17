@@ -3,7 +3,6 @@ import LoginInputField from './LoginInputField.jsx'
 import SignupInputField from './SignupInputField.jsx'
 import Toggle from './Toggle.jsx'
 import SubmitBtn from './SubmitBtn.jsx'
-import '../../App.css'
 
 function LoginPage() {
   const [toggle, setToggle] = useState(0)

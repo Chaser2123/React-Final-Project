@@ -1,7 +1,10 @@
 'use client'
 
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { auth, db } from "@/lib/firebase";
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
 export const AuthContext = createContext(null);
 
@@ -14,29 +17,44 @@ export default function AuthProvider({ children }) {
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [userRole, setUserRole] = useState("");
 
-    const login = (user) => {
-        // Accept either a role string (backwards compatible) or a user object
-        let role = "";
-        let firstName = "";
-        let lastName = "";
-        if (typeof user === 'string') {
-            role = user || 'user';
-        } else if (user && typeof user === 'object') {
-            role = user.role || 'user';
-            firstName = user.firstName || user.name || '';
-            lastName = user.lastName || '';
-        } else {
-            role = 'user';
-        }
-        setIsAuthorized(true);
-        setUserRole(role);
-        setCurrentUser({ role, firstName, lastName });
+    // Subscribe to Firebase auth state and load profile from Firestore
+    useEffect(() => {
+        const unsub = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const profileRef = doc(db, "users", user.uid);
+                    const snap = await getDoc(profileRef);
+                    const profile = snap.exists() ? snap.data() : {};
+                    const role = profile.role || 'user';
+                    const firstName = profile.firstName || '';
+                    const lastName = profile.lastName || '';
+                    setIsAuthorized(true);
+                    setUserRole(role);
+                    setCurrentUser({ role, firstName, lastName, uid: user.uid, email: user.email });
+                } catch (e) {
+                    // Fallback to minimal user data if profile fetch fails
+                    setIsAuthorized(true);
+                    setUserRole('user');
+                    setCurrentUser({ role: 'user', firstName: '', lastName: '', uid: user.uid, email: user.email });
+                }
+            } else {
+                setIsAuthorized(false);
+                setUserRole("");
+                setCurrentUser('guest');
+            }
+        });
+        return () => unsub();
+    }, []);
+
+    // Login via Firebase Auth
+    const login = async ({ email, password }) => {
+        await signInWithEmailAndPassword(auth, email, password);
+        // onAuthStateChanged will update context
     };
 
-    const logout = () => {
-        setIsAuthorized(false);
-        setUserRole("");
-        setCurrentUser('guest');
+    // Logout via Firebase Auth
+    const logout = async () => {
+        await signOut(auth);
         router.replace('/');
     };
 

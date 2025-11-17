@@ -31,7 +31,7 @@ export default function AppHeader() {
             <span>{`Welcome, ${user}`}</span>
           </Link>
         ) : (
-          <Link href="/loginpage" className={`${headerStyles} ${isActive("/loginpage") ? pageUnderline : ''}`}>
+          <Link href="/login" className={`${headerStyles} ${isActive("/login") ? pageUnderline : ''}`}>
             <FaUserCircle className="text-3xl" />
             <span>Login / Sign Up</span>
           </Link>

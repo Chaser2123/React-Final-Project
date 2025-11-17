@@ -1,11 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Link from "next/link";
 import AuthProvider from "@/context/AuthContext.jsx";
-
-import { HiTicket } from "react-icons/hi2";
-import { FaHome } from "react-icons/fa";
-import { FaUserCircle } from "react-icons/fa";
+import AppHeader from "@/components/AppHeader.jsx";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,21 +19,11 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  const headerStyles = 'inline-flex items-center gap-2';
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
-          <header className="p-4 flex flex-nowrap justify-between bg-gray-200 dark:bg-cyan-700">
-            <Link href="/" className="font-bold text-lg">Flight Booker</Link>
-            <div className="flex gap-5 items-center">
-              <Link href="/" className={headerStyles}><FaHome className="text-3xl" /><span>Home</span></Link>
-              <Link href="/bookflight" className={headerStyles}><HiTicket className="text-3xl" /><span>Book A Flight</span></Link>
-              <Link href="/loginpage" className={headerStyles}><FaUserCircle className="text-3xl" /><span>Login In / Sign Up</span></Link>
-            </div>
-          </header>
+          <AppHeader />
           {children}
         </AuthProvider>
       </body>

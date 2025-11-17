@@ -20,7 +20,7 @@ export default function AppHeader() {
   };
 
   return (
-    <header className="p-4 flex flex-nowrap justify-between bg-gray-200 dark:bg-cyan-700">
+    <header className="p-4 flex flex-nowrap justify-between bg-cyan-200 dark:bg-cyan-700">
       <Link href="/" className="font-bold text-lg">Flight Booker</Link>
       <div className="flex gap-5 items-center">
         <Link href="/" className={`${headerStyles} ${isActive("/", { exact: true }) ? pageUnderline : ''}`}><FaHome className="text-3xl" /><span>Home</span></Link>

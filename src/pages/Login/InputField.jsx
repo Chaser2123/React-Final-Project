@@ -2,7 +2,7 @@ export default function InputField({ label, type = 'text', placeholder = '', val
   const computedId = id ?? name; // assume at least one is provided by parent
   const computedName = name ?? id;
   return (
-    <div className="mb-4 flex items-center gap-4">
+    <div className="mb-2 flex items-center gap-4">
       <label
         className="w-32 text-right text-gray-700 text-sm font-medium"
         htmlFor={computedId}

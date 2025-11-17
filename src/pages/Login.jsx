@@ -34,9 +34,68 @@ function Login() {
     const { name, value } = e.target
     setForm(prev => ({ ...prev, [name]: value }))
   }
+  function AuthLogin() {
+    if (toggle === 0) {
+      console.log("Logging in with", username, password)
+      // Attempt to retrieve saved user to populate name
+      const existingUser = savedUsers[username] || null
+      if (existingUser) {
+        authLogin({ role: existingUser.role || 'user', firstName: existingUser.firstName, lastName: existingUser.lastName })
+      } else {
+        authLogin({ role: 'user', firstName: username })
+      }
+      // Redirect to home after successful login
+      router.replace('/')
+    } else {
+      if (!password) {
+        alert("Please enter a password.")
+        return
+      }
+      const passReq = []
+      if (password.length < 8) passReq.push('be at least 8 characters long')
+      if (!/[A-Z]/.test(password)) passReq.push('include at least one uppercase letter')
+      if (!/[a-z]/.test(password)) passReq.push('include at least one lowercase letter')
+      if (!/\d/.test(password)) passReq.push('include at least one number')
+
+      if (passReq.length > 0) {
+        const message = passReq.length === 1
+          ? passReq[0]
+          : `${passReq.slice(0, -1).join(', ')}, and ${passReq[passReq.length - 1]}`
+        alert(`Password must ${message}.`)
+        return
+      }
+      if (!email || !firstName || !lastName || !confirmPassword) {
+        alert("Please fill in all fields to sign up.")
+        return
+      }
+      if (savedUsers[email]) {
+        alert("Email already exists, please sign up with a different email.")
+        return
+      }
+      if (password !== confirmPassword) {
+        alert("Passwords do not match, please try again.")
+        return
+      }
+      // Store new user keyed by email
+      savedUsers[email] = {
+        email,
+        firstName,
+        lastName,
+        password,
+        role: 'user'
+      }
+      localStorage.setItem('users', JSON.stringify(savedUsers))
+      console.log("Signing up with", email, firstName, lastName, password)
+      // Set auth context with provided names
+      authLogin({ role: 'user', firstName, lastName })
+      // Navigate back to previous page after successful signup
+      router.back()
+    }
+  }
+
 
   return (
-    <div className="w-full min-h-screen flex flex-col justify-start items-center bg-image bg-cover bg-center bg-[url('@/images/airplaneBG.jpg')]">
+  <div className="w-full min-h-screen flex flex-col justify-start items-center fixed bg-image bg-cover bg-center bg-[url('@/images/airplaneBG.jpg')]">
     <div className="flex flex-col gap-6 w-96 mx-auto mt-20 p-8 border-2 border-slate-300 rounded-lg shadow-lg bg-white">
       {/* Toggle group with proper spacing */}
       <div className="relative flex flex-col items-center mb-6 p-4 bg-slate-100 rounded-lg">
@@ -45,9 +104,9 @@ function Login() {
           <Toggle label="Sign Up" index={1} active={toggle} onClick={setToggle} />
         </div>
         <div
-          className="absolute top-0 left-1/4 h-full bg-blue-400 rounded-lg w-1/4 transition-transform duration-400 ease-in-out"
+          className="absolute top-0 left-1/4 h-2 bg-blue-400 rounded-lg w-1/4 transition-transform duration-400 ease-in-out"
           style={{
-            transform: `translateX(${toggle === 0 ? '0%' : '83px'})`,
+            transform: `translateX(${toggle === 0 ? '-1rem' : '5.2rem'})`,
             backgroundColor: toggle === 0 ? '#3b82f6' : '#28b0a2',
             transition: 'transform 400ms ease-in-out, background-color 400ms ease-in-out'
           }}
@@ -64,63 +123,18 @@ function Login() {
           />
         ) : (
           <SignupInputField
-            values={{
-              email,
-              firstName,
-              lastName,
-              password,
-              confirmPassword
-            }}
+            values={{ email, firstName, lastName, password, confirmPassword }}
             onChange={handleChange}
           />
         )}
         <div className="mt-4 flex justify-center">
-          <SubmitBtn
-            label={toggle === 0 ? "Login" : "Sign Up"}
-            onClick={() => {
-              if (toggle === 0) {
-                console.log("Logging in with", username, password)
-                // Attempt to retrieve saved user to populate name
-                const existingUser = savedUsers[username] || null;
-                if (existingUser) {
-                  authLogin({ role: existingUser.role || 'user', firstName: existingUser.firstName, lastName: existingUser.lastName });
-                } else {
-                  authLogin({ role: 'user', firstName: username });
-                }
-                // Redirect to home after successful login
-                router.replace('/')
-              } else {
-                // Check for existing email, then save new user to localStorage
-                if (savedUsers[email]) {
-                  alert("Email already exists, please sign up with a different email.")
-                  return
-                }
-                if (password !== confirmPassword) {
-                  alert("Passwords do not match, please try again.")
-                  return
-                }
-                // Store new user keyed by email
-                savedUsers[email] = {
-                  email,
-                  firstName,
-                  lastName,
-                  password,
-                  role: 'user'
-                }
-                localStorage.setItem('users', JSON.stringify(savedUsers))
-                console.log("Signing up with", email, firstName, lastName, password)
-                // Set auth context with provided names
-                authLogin({ role: 'user', firstName, lastName })
-                // Navigate back to previous page after successful signup
-                router.back()
-              }
-            }}
-          />
+          <SubmitBtn label={toggle === 0 ? "Login" : "Sign Up"} onClick={AuthLogin} />
         </div>
       </div>
     </div>
   </div>
   )
+
 }
 
 export default Login

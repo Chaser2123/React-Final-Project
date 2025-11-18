@@ -12,6 +12,7 @@ export default function AuthProvider({ children }) {
     // Track the current user; default to 'guest' when no user is set
     const [currentUser, setCurrentUser] = useState('guest');
     const [isInitializing, setIsInitializing] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
     // Keep existing flags for backward compatibility
@@ -90,23 +91,28 @@ export default function AuthProvider({ children }) {
     };
 
     const login = async ({ email, password }) => {
-        const cred = await signInWithEmailAndPassword(auth, email, password);
-        // Prime immediately using available displayName/email
-        primeAuthUser(cred.user);
-        // Then refine from Firestore and persist to Auth profile for next time
+        setIsLoading(true);
         try {
-            const profileRef = doc(db, "users", cred.user.uid);
-            const snap = await getDoc(profileRef);
-            if (snap.exists()) {
-                const { firstName = '', lastName = '', role = 'user' } = snap.data() || {};
-                primeAuthUser(cred.user, { firstName, lastName, role });
-                const full = [firstName, lastName].filter(Boolean).join(' ').trim();
-                if (full && (!cred.user.displayName || cred.user.displayName !== full)) {
-                    await updateProfile(cred.user, { displayName: full });
+            const cred = await signInWithEmailAndPassword(auth, email, password);
+            // Prime immediately using available displayName/email
+            primeAuthUser(cred.user);
+            // Then refine from Firestore and persist to Auth profile for next time
+            try {
+                const profileRef = doc(db, "users", cred.user.uid);
+                const snap = await getDoc(profileRef);
+                if (snap.exists()) {
+                    const { firstName = '', lastName = '', role = 'user' } = snap.data() || {};
+                    primeAuthUser(cred.user, { firstName, lastName, role });
+                    const full = [firstName, lastName].filter(Boolean).join(' ').trim();
+                    if (full && (!cred.user.displayName || cred.user.displayName !== full)) {
+                        await updateProfile(cred.user, { displayName: full });
+                    }
                 }
+            } catch {
+                // best-effort refinement; ignore errors
             }
-        } catch {
-            // best-effort refinement; ignore errors
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -117,7 +123,7 @@ export default function AuthProvider({ children }) {
     };
 
     return (
-        <AuthContext.Provider value={{ currentUser, setCurrentUser, isAuthorized, userRole, isInitializing, login, logout, primeAuthUser }}>
+        <AuthContext.Provider value={{ currentUser, setCurrentUser, isAuthorized, userRole, isInitializing, isLoading, login, logout, primeAuthUser }}>
             {children}
         </AuthContext.Provider>
     );

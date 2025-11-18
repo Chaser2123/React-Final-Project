@@ -13,7 +13,7 @@ export default function FlightSearchParam({
 }) {
   // Checkbox variant renders inline with the label text on the right
   return (
-    <label className={`${labelClassName} ${className}`}>
+    <label className={`${labelClassName} ${className} text-black`}>
       {label}
       <input type='text' className={inputClassName} value={value} onChange={onChange} {...rest} />
       {children}

@@ -46,10 +46,13 @@ export default async function Home() {
             <h1 className="text-3xl font-bold underline">
         Book A Flight!
       </h1>
-      
+
       <div className="rounded-md bg-white max-w-3xl p-6 shadow flex">
-        <h2 className="text-lg font-medium">Flight Search Parameters</h2>
-        <FlightSearchForm />
+        <div className="w-15 h-15 rounded-full bg-none border-l-8 bordet border-blue-500 animate-spin ease-in-out mr-4">
+
+        </div>
+        <h2 className="text-lg font-medium text-black">Flight Search Parameters</h2>
+        <FlightSearchForm className="text-slate-900" />
       </div>
 
       

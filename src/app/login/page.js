@@ -8,6 +8,7 @@ import LoginInputField from './LoginInputField.jsx';
 import SignupInputField from './SignupInputField.jsx';
 import Toggle from './Toggle.jsx';
 import SubmitBtn from './SubmitBtn.jsx';
+import LoadingScreen from '@/components/LoadingScreen.jsx';
 
 import '@/app/globals.css';
 import { auth, db } from '@/lib/firebase';
@@ -16,7 +17,8 @@ import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login: authLogin, primeAuthUser } = useAuth() || {}; // handle null context gracefully
+  const { login: authLogin, primeAuthUser, isLoading: authIsLoading } = useAuth() || {}; // handle null context gracefully
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [toggle, setToggle] = useState(0);
   const [form, setForm] = useState({
     password: '',
@@ -60,6 +62,7 @@ export default function LoginPage() {
         return;
       }
       if (authLogin) {
+        setIsSubmitting(true);
         const sanitizedEmail = email.trim();
         authLogin({ email: sanitizedEmail, password })
           .then(() => router.replace('/'))
@@ -67,6 +70,7 @@ export default function LoginPage() {
             console.error('Login error raw:', err);
             const friendly = firebaseErrorMap[err.code] || err.message || 'Failed to log in.';
             alert(friendly);
+            setIsSubmitting(false);
           });
       } else {
         alert('Auth not ready, please retry.');
@@ -96,6 +100,7 @@ export default function LoginPage() {
         alert('Passwords do not match, please try again.');
         return;
       }
+      setIsSubmitting(true);
       const sanitizedEmail = email.trim();
       createUserWithEmailAndPassword(auth, sanitizedEmail, password)
         .then(async (cred) => {
@@ -126,13 +131,17 @@ export default function LoginPage() {
           console.error('Signup error raw:', err);
           const friendly = firebaseErrorMap[err.code] || err.message || 'Failed to sign up.';
           alert(friendly);
+          setIsSubmitting(false);
         });
     }
   };
 
+  const isLoading = authIsLoading || isSubmitting;
+
   return (
     <div className="w-full min-h-screen flex flex-col justify-start items-center fixed bg-image bg-cover bg-center bg-[url('@/images/airplaneBG.jpg')]">
-      <div className="flex flex-col gap-6 w-96 mx-auto mt-20 p-8 border-2 border-slate-300 rounded-lg shadow-lg bg-white">
+      {isLoading && <LoadingScreen />}
+      <div className={`flex flex-col gap-6 w-96 mx-auto mt-20 p-8 border-2 border-slate-300 rounded-lg shadow-lg bg-white ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}>
         <div className="relative flex flex-col items-center mb-6 p-4 bg-slate-100 rounded-lg">
           <div className="flex gap-6 justify-center w-full relative">
             <Toggle label="Login" index={0} active={toggle} onClick={setToggle} />
@@ -155,7 +164,7 @@ export default function LoginPage() {
             <SignupInputField values={{ email, firstName, lastName, password, confirmPassword }} onChange={handleChange} />
           )}
           <div className="mt-4 flex justify-center">
-            <SubmitBtn label={toggle === 0 ? 'Login' : 'Sign Up'} onClick={handleAuth} />
+            <SubmitBtn label={toggle === 0 ? 'Login' : 'Sign Up'} onClick={handleAuth} disabled={isLoading} />
           </div>
         </div>
       </div>

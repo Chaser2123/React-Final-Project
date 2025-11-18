@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, initializeAuth, browserLocalPersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -39,6 +39,19 @@ if (!validation.ok) {
 
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 
-export const auth = getAuth(app);
+let authInstance;
+if (typeof window !== 'undefined') {
+  try {
+    // Avoid IndexedDB init delays (notably in some browsers/incognito) by preferring localStorage
+    authInstance = initializeAuth(app, { persistence: browserLocalPersistence });
+  } catch (e) {
+    // initializeAuth may throw if already initialized; fall back to getAuth
+    authInstance = getAuth(app);
+  }
+} else {
+  authInstance = getAuth(app);
+}
+
+export const auth = authInstance;
 export const db = getFirestore(app);
 export default app;

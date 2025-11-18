@@ -11,12 +11,12 @@ import SubmitBtn from './SubmitBtn.jsx';
 
 import '@/app/globals.css';
 import { auth, db } from '@/lib/firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login: authLogin } = useAuth() || {}; // handle null context gracefully
+  const { login: authLogin, primeAuthUser } = useAuth() || {}; // handle null context gracefully
   const [toggle, setToggle] = useState(0);
   const [form, setForm] = useState({
     password: '',
@@ -100,6 +100,19 @@ export default function LoginPage() {
       createUserWithEmailAndPassword(auth, sanitizedEmail, password)
         .then(async (cred) => {
           const uid = cred.user.uid;
+          try {
+            const fullName = [firstName, lastName].filter(Boolean).join(' ').trim();
+            if (fullName) {
+              await updateProfile(cred.user, { displayName: fullName });
+            }
+          } catch (e) {
+            // eslint-disable-next-line no-console
+            console.warn('Failed to set auth displayName', e);
+          }
+          // Prime context immediately so header updates instantly
+          try {
+            primeAuthUser && primeAuthUser(cred.user, { firstName, lastName, role: 'user' });
+          } catch {}
           await setDoc(doc(db, 'users', uid), {
             email: sanitizedEmail,
             firstName,

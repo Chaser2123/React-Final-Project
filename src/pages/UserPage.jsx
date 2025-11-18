@@ -4,9 +4,15 @@ import useAuth from "@/hooks/useAuth";
 export default function UserPage() {
   const { currentUser, logout } = useAuth() || {};
 
+  const displayName = (() => {
+    if (!currentUser || currentUser === 'guest') return '';
+    const name = [currentUser.firstName, currentUser.lastName].filter(Boolean).join(' ').trim();
+    return name || currentUser.email || 'User';
+  })();
+
   return (
     <main className="p-6 space-y-4">
-      <h1 className="text-2xl font-semibold">Welcome {currentUser?.firstName} {currentUser?.lastName}</h1>
+      <h1 className="text-2xl font-semibold">TheWelcome {displayName}</h1>
       <div>
         <h2 className="text-xl font-medium">Role: {currentUser?.role || 'User'}</h2>
       </div>

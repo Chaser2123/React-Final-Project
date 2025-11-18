@@ -1,4 +1,3 @@
-import Login from "@/pages/Login.jsx";
-export default function LoginPage() {
-    return <Login />;
-}
+// Legacy route compatibility: /loginpage now reuses /login implementation
+import LoginPage from '../login/page';
+export default LoginPage;

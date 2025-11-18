@@ -1,12 +1,11 @@
+"use client";
+
 export default function InputField({ label, type = 'text', placeholder = '', value = '', onChange, name, id }) {
-  const computedId = id ?? name; // assume at least one is provided by parent
+  const computedId = id ?? name;
   const computedName = name ?? id;
   return (
     <div className="mb-2 flex items-center gap-4">
-      <label
-        className="w-32 text-right text-gray-700 text-sm font-medium"
-        htmlFor={computedId}
-      >
+      <label className="w-32 text-right text-gray-700 text-sm font-medium" htmlFor={computedId}>
         {label}
       </label>
       <input

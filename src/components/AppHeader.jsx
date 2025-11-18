@@ -9,9 +9,16 @@ export default function AppHeader() {
   const headerStyles = 'inline-flex items-center gap-2';
   const pageUnderline = 'underline underline-offset-5 decoration-4';
   const { isAuthorized, currentUser } = useAuth() || {};
-  const user = typeof currentUser === 'string'
-    ? (currentUser === 'guest' ? null : currentUser)
-    : (currentUser?.firstName || currentUser?.name || currentUser?.role || null);
+  const displayName = (() => {
+    if (!currentUser || currentUser === 'guest') return null;
+    const first = currentUser.firstName?.trim();
+    if (first) return first; // greet by first name only
+    const last = currentUser.lastName?.trim();
+    if (last) return last;
+    const email = currentUser.email || '';
+    const local = email.includes('@') ? email.split('@')[0] : email;
+    return local || 'User';
+  })();
 
   const pathname = usePathname();
   const isActive = (href, { exact = false } = {}) => {
@@ -25,13 +32,13 @@ export default function AppHeader() {
       <div className="flex gap-5 items-center">
         <Link href="/" className={`${headerStyles} ${isActive("/", { exact: true }) ? pageUnderline : ''}`}><FaHome className="text-3xl" /><span>Home</span></Link>
         <Link href="/bookflight" className={`${headerStyles} ${isActive("/bookflight") ? pageUnderline : ''}`}><HiTicket className="text-3xl" /><span>Book A Flight</span></Link>
-        {isAuthorized && user ? (
+        {isAuthorized && displayName ? (
           <Link href="/userpage" className={`${headerStyles} ${isActive("/userpage") ? pageUnderline : ''}`}>
             <FaUserCircle className="text-3xl" />
-            <span>{`Welcome, ${user}`}</span>
+            <span>{`Welcome, ${displayName}`}</span>
           </Link>
         ) : (
-          <Link href="/loginpage" className={`${headerStyles} ${isActive("/loginpage") ? pageUnderline : ''}`}>
+          <Link href="/login" className={`${headerStyles} ${isActive("/login") ? pageUnderline : ''}`}>
             <FaUserCircle className="text-3xl" />
             <span>Login / Sign Up</span>
           </Link>

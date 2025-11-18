@@ -1,4 +1,4 @@
-import InputField from "./InputField"
+import InputField from "@/app/login/InputField"
 
 export default function LoginInputField({ values, onChange }) {
     return (

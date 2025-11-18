@@ -1,4 +1,4 @@
-import BookFlight from "@/pages/BookFlight";
+import FlightSearchForm from "@/pages/BookFlight/FlightSearchForm";
 import FlightList from "../../components/FlightList.jsx";
 
 export default async function Home() {
@@ -43,9 +43,16 @@ export default async function Home() {
 
   return (
     <main>
-      <h1 className="text-3xl font-bold underline">
+            <h1 className="text-3xl font-bold underline">
         Book A Flight!
       </h1>
+      
+      <div className="rounded-md bg-white max-w-3xl p-6 shadow flex">
+        <h2 className="text-lg font-medium">Flight Search Parameters</h2>
+        <FlightSearchForm />
+      </div>
+
+      
       <div id="renderLocation"></div>
       <FlightList flightsList={processFlightData()} />
     </main>

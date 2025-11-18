@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import LoginInputField from './LoginInputField.jsx'
-import SignupInputField from './SignupInputField.jsx'
-import Toggle from './Toggle.jsx'
-import SubmitBtn from './SubmitBtn.jsx'
+import SignupInputField from '@/app/login/SignupInputField.jsx'
+import Toggle from '@/app/login/Toggle.jsx'
+import SubmitBtn from '@/app/login/SubmitBtn.jsx'
 
 function LoginPage() {
   const [toggle, setToggle] = useState(0)

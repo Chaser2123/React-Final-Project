@@ -96,21 +96,8 @@ export default function AuthProvider({ children }) {
             const cred = await signInWithEmailAndPassword(auth, email, password);
             // Prime immediately using available displayName/email
             primeAuthUser(cred.user);
-            // Then refine from Firestore and persist to Auth profile for next time
-            try {
-                const profileRef = doc(db, "users", cred.user.uid);
-                const snap = await getDoc(profileRef);
-                if (snap.exists()) {
-                    const { firstName = '', lastName = '', role = 'user' } = snap.data() || {};
-                    primeAuthUser(cred.user, { firstName, lastName, role });
-                    const full = [firstName, lastName].filter(Boolean).join(' ').trim();
-                    if (full && (!cred.user.displayName || cred.user.displayName !== full)) {
-                        await updateProfile(cred.user, { displayName: full });
-                    }
-                }
-            } catch {
-                // best-effort refinement; ignore errors
-            }
+            // Don't fetch from Firestore here—let onAuthStateChanged handle it to avoid duplicate requests
+            // that cause NS_BINDING_ABORTED errors
         } finally {
             setIsLoading(false);
         }

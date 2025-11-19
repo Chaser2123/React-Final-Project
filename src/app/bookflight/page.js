@@ -1,5 +1,6 @@
 import FlightSearchForm from "@/pages/BookFlight/FlightSearchForm";
 import FlightList from "../../components/FlightList.jsx";
+import charlestonBg from "@/images/Seattle.jpg";
 
 export default async function Home() {
     const API_KEY = process.env.API_KEY;
@@ -15,11 +16,14 @@ export default async function Home() {
       }
     }
     class FlightDetails {
-      constructor(arrivalAirport, arrivalId, departureAirport, departureId) {
+      constructor(arrivalAirport, arrivalId, departureAirport, departureId, airline, airline_logo, flight_number) {
         this.arrivalAirport = arrivalAirport;
         this.arrivalId = arrivalId;
         this.departureAirport = departureAirport;
         this.departureId = departureId;
+        this.airline = airline;
+        this.airline_logo = airline_logo;
+        this.flight_number = flight_number;
       }
     }
     function processFlightData() {
@@ -31,7 +35,10 @@ export default async function Home() {
           flightStops.arrival_airport.name,
           flightStops.arrival_airport.id,
           flightStops.departure_airport.name,
-          flightStops.departure_airport.id
+          flightStops.departure_airport.id,
+          flightStops.airline,
+          flightStops.airline_logo,
+          flightStops.flight_number
         );
         flightRouteList.add(flightDetails);
       }
@@ -42,7 +49,7 @@ export default async function Home() {
   }
 
   return (
-    <main>
+    <main className="min-h-screen bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${charlestonBg.src})` }}>
             <h1 className="text-3xl font-bold underline">
         Book A Flight!
       </h1>

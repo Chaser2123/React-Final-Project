@@ -4,8 +4,8 @@ import { useState } from "react";
 export default function FlightSearchForm({ defaults = {}}) {
   const [departure, setDeparture] = useState(defaults.departure_id || "PEK");
   const [arrival, setArrival] = useState(defaults.arrival_id || "AUS");
-  const [outbound, setOutbound] = useState(defaults.outbound_date || "2025-11-14");
-  const [returnd, setReturnd] = useState(defaults.return_date || "2025-11-20");
+  const [outbound, setOutbound] = useState(defaults.outbound_date || new Date().toISOString().split('T')[0]);
+  const [returnd, setReturnd] = useState(defaults.return_date || new Date().toISOString().split('T')[0]);
 
   const handleSubmit = () => {
     alert(`form submitted: ${departure}, ${arrival}, ${outbound}, ${returnd}`);

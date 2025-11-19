@@ -16,7 +16,7 @@ export default async function Home() {
       }
     }
     class FlightDetails {
-      constructor(arrivalAirport, arrivalId, departureAirport, departureId, airline, airline_logo, flight_number) {
+      constructor(arrivalAirport, arrivalId, departureAirport, departureId, airline, airline_logo, flight_number, price) {
         this.arrivalAirport = arrivalAirport;
         this.arrivalId = arrivalId;
         this.departureAirport = departureAirport;
@@ -24,10 +24,11 @@ export default async function Home() {
         this.airline = airline;
         this.airline_logo = airline_logo;
         this.flight_number = flight_number;
+        this.price = price;
       }
     }
     function processFlightData() {
-      const compiledFlights = new flightList
+      const compiledFlights = new flightList();
      for (const flights of data.best_flights && data.other_flights) {
       const flightRouteList = new flightList();
       for (const flightStops of flights.flights) {
@@ -38,7 +39,8 @@ export default async function Home() {
           flightStops.departure_airport.id,
           flightStops.airline,
           flightStops.airline_logo,
-          flightStops.flight_number
+          flightStops.flight_number,
+          flights.price
         );
         flightRouteList.add(flightDetails);
       }

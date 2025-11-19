@@ -12,7 +12,7 @@ export default function UserPage() {
 
   return (
     <main className="p-6 space-y-4">
-      <h1 className="text-2xl font-semibold">TheWelcome {displayName}</h1>
+      <h1 className="text-2xl font-semibold">Welcome {displayName}</h1>
       <div>
         <h2 className="text-xl font-medium">Role: {currentUser?.role || 'User'}</h2>
       </div>

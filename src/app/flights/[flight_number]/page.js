@@ -1,10 +1,15 @@
+import SeatMap from '@/components/SeatMap.jsx';
 
-export default async function FlightDetails({params}) {
-    const {flight_number}= await params
+export default async function FlightDetails({ params }) {
+    const { flight_number } = await params;
+    const flightRowsCount = 15; // Example: 20 rows
+    const seatsPerRow = 6 
+
     return (
-        <div>
-            <h1 className="text-white">Flight Details for Flight Number: {flight_number}</h1>
-        </div>
+        <SeatMap 
+            flightNumber={flight_number} 
+            flightRowsCount={flightRowsCount}
+            seatsPerRow={seatsPerRow}
+        />
     );
-
 }

@@ -1,6 +1,5 @@
 import FlightSearchForm from "@/pages/BookFlight/FlightSearchForm";
 import FlightList from "../../components/FlightList.jsx";
-import charlestonBg from "@/images/Seattle.jpg";
 import serpFallback from "../../../SERPAPI_SEARHES.json";
 
 export default async function Home() {
@@ -24,7 +23,7 @@ export default async function Home() {
   const flights = normalizeSerpData(data);
 
   return (
-    <main className="min-h-screen bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${charlestonBg.src})` }}>
+    <main >
       <h1 className="text-3xl font-bold underline">Book A Flight!</h1>
 
       <div className="rounded-md bg-white max-w-3xl p-6 shadow flex">

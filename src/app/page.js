@@ -1,4 +1,3 @@
-import FlightList from "../components/FlightList.jsx";
 
 export default function Home() {
   return (

@@ -10,7 +10,7 @@ export default function FlightList({ flightsList }) {
             ? flightsList.flights
             : (Array.isArray(flightsList) ? flightsList : []));
             return (
-            <div className="flight-grid px-2 py-2 flex flex-col gap-6">
+            <div className="flight-grid px-2 py-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {allFlights.map((flight, idx) => {
                 const airline = flight?.airline || "";
                 const airlineLogo = flight?.airline_logo || flight?.airlineLogo || "";

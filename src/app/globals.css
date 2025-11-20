@@ -14,7 +14,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #111827;
+    
     /* --foreground: #ededed; */
   }
 }
@@ -28,9 +29,9 @@ body {
 /* Flight list grid and card styling */
 .flight-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
 }
+
 
 .flight-card {
   background: linear-gradient(to right, #e7e5e4, #6366f1);

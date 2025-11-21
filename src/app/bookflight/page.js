@@ -4,6 +4,10 @@ import FlightList from "../../components/FlightList.jsx";
 import { fetchAndNormalizeFlights } from "@/lib/flightDataFetcher";
 import { useState, useEffect } from "react";
 
+// Chases's Code that was conflicted 
+// export default asnc function Home(){ 
+//   const flights = await fetchAndNormalizeFlights();}
+
 export default function Home() {
   const [flights, setFlights] = useState([]);
   const [loading, setLoading] = useState(false);

@@ -45,7 +45,7 @@ export default function FlightDetails({ params }) {
             <h1 className="text-white text-3xl font-bold text-center my-4">Flight Details for {flightNumber}</h1>
             <div className='flex justify-around'>
             {flight ? (
-                <div className="bg-white h-auto p-4 border-2 border-slate-300 rounded-lg shadow-lg mb-6">
+                <div className="bg-white h-auto p-4 border-2 w-120 border-slate-300 rounded-lg shadow-lg mb-6">
                     <div className="flex justify-between items-center mb-2">
                         <div className="font-bold text-base mb-1 flex items-center gap-2">
                             {flightData.airlineLogo ? (<img className="w-8 h-8" src={flightData.airlineLogo} alt={flightData.airline || "airline logo"} />) : null}
@@ -61,6 +61,14 @@ export default function FlightDetails({ params }) {
                         <div className="flex"><FaPlaneArrival className="inline mr-2" /> <span><strong>Arrival Airport:</strong> {flightData.arrivalAirportName} <span className="text-xs">({flightData.arrivalId})</span></span></div>
                     ) : null}
                     <button className='rounded bg-blue-950 border-blue-700 border-2 hover:bg-blue-800 text-white px-4 py-2 mt-2'>Proceed to Checkout</button>
+                    <div>
+                        <strong>Goal:</strong>
+                        <div>* If you select a flight with connecting flights, instead of showing the Proceed to Checkout button, display "Next Flight" button that when clicked shows details of the next flight.</div>
+                        <div><em>Not yet implemented.</em></div>
+                        <br />
+                        <div>* Pull from another API that will correcltly show which seats have been taken already, and show different prices for different classes (Economy, Business, First Class).</div>
+                        <div><em>Not yet implemented.</em></div>
+                    </div>
                 </div>
             ) : (
                 <p className="text-red-600 mb-6">Flight not found.</p>

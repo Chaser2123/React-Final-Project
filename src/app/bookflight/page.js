@@ -1,7 +1,8 @@
 "use client";
 import FlightSearchForm from "@/pages/BookFlight/FlightSearchForm";
 import FlightList from "../../components/FlightList.jsx";
-import { fetchAndNormalizeFlights } from "@/lib/flightDataFetcher";
+import { fetchAndNormalizeFlights, normalizeSerpData } from "@/lib/flightDataFetcher";
+import serpFallback from "../../../SERPAPI_SEARHES.json";
 import { useState, useEffect } from "react";
 
 // Chases's Code that was conflicted 

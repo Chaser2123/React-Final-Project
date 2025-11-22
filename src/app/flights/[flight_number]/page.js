@@ -80,6 +80,10 @@ export default function FlightDetails({ params }) {
                 seatsPerRow={seatingConfig.seatsPerRow}
                 seatCost={seatCost}
                 onTotalCostChange={handleTotalCostChange}
+                departureDate={flightData.departureDate || '2025-12-25'}
+                origin={flightData.departureId}
+                destination={flightData.arrivalId}
+                aircraftType={flightData.airplane}
             />
             </div>
         </div>

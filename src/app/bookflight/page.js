@@ -1,6 +1,7 @@
 "use client";
 import FlightSearchForm from "@/pages/BookFlight/FlightSearchForm";
 import FlightList from "../../components/FlightList.jsx";
+import LoadingScreen from "../../components/LoadingScreen.jsx";
 import { normalizeSerpData } from "@/lib/flightDataFetcher";
 import { useState, useEffect } from "react";
 
@@ -26,6 +27,7 @@ export default function Home() {
 
   const searchFlights = async (departure, arrival, outbound, returnd) => {
     console.log('Search clicked with:', { departure, arrival, outbound, returnd });
+    setFlights([]); // Clear existing tickets
     setLoading(true);
     try {
       // Use /api route to keep API key secure on server side
@@ -65,8 +67,7 @@ export default function Home() {
       </div>
 
       <div id="renderLocation"></div>
-      {loading && <p className="text-center mt-4">Searching for flights...</p>}
-      <FlightList flightsList={flights} />
+      {loading ? <LoadingScreen /> : <FlightList flightsList={flights} />}
     </main>
   );
 }

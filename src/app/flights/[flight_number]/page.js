@@ -45,6 +45,9 @@ export default function FlightDetails({ params }) {
             if (foundFlight) {
                 const extractedData = extractFlightData(foundFlight);
                 console.log('Extracted flight data:', extractedData);
+                console.log('airlineLogo:', extractedData.airlineLogo);
+                console.log('departureAirportName:', extractedData.departureAirportName);
+                console.log('arrivalAirportName:', extractedData.arrivalAirportName);
                 setFlightData(extractedData);
                 
                 // Get seating configuration based on aircraft type
@@ -68,19 +71,41 @@ export default function FlightDetails({ params }) {
                 <div className="bg-white h-auto p-4 border-2 w-120 border-slate-300 rounded-lg shadow-lg mb-6">
                     <div className="flex justify-between items-center mb-2">
                         <div className="font-bold text-base mb-1 flex items-center gap-2">
-                            {flightData.airlineLogo ? (<img className="w-8 h-8" src={flightData.airlineLogo} alt={flightData.airline || "airline logo"} />) : null}
+                            {flightData.airlineLogo && (<img className="w-8 h-8" src={flightData.airlineLogo} alt={flightData.airline || "airline logo"} />)}
                             <span>{flightData.airline && flightData.airline.trim().split(/\s+/).length === 1 ? `${flightData.airline} Airlines` : flightData.airline}</span>
                         </div>
                         <span className="text-xl text-green-600 font-extrabold">$ {totalCost.toLocaleString()}</span>
                     </div>
 
-                    {flightData.departureAirportName || flightData.departureId ? (
-                        <div className="flex"><FaPlaneDeparture className="inline mr-2" /> <span><strong>Departure Airport:</strong> {flightData.departureAirportName} <span className="text-xs">({flightData.departureId})</span></span></div>
-                    ) : null}
-                    {flightData.arrivalAirportName || flightData.arrivalId ? (
-                        <div className="flex"><FaPlaneArrival className="inline mr-2" /> <span><strong>Arrival Airport:</strong> {flightData.arrivalAirportName} <span className="text-xs">({flightData.arrivalId})</span></span></div>
-                    ) : null}
-                    <button className='rounded bg-blue-950 border-blue-700 border-2 hover:bg-blue-800 text-white px-4 py-2 mt-2'>Proceed to Checkout</button>
+                    {(flightData.departureAirportName || flightData.departureId) && (
+                        <div className="flex items-center mb-2"><FaPlaneDeparture className="inline mr-2" /> <span><strong>Departure:</strong> {flightData.departureAirportName} {flightData.departureId && <span className="text-xs">({flightData.departureId})</span>}</span></div>
+                    )}
+                    {(flightData.arrivalAirportName || flightData.arrivalId) && (
+                        <div className="flex items-center mb-2"><FaPlaneArrival className="inline mr-2" /> <span><strong>Arrival:</strong> {flightData.arrivalAirportName} {flightData.arrivalId && <span className="text-xs">({flightData.arrivalId})</span>}</span></div>
+                    )}
+
+                    <div className="text-sm mt-3 space-y-1">
+                        {flightData.departureTime && (
+                            <div><strong>Departure Time:</strong> {flightData.departureTime}</div>
+                        )}
+                        {flightData.arrivalTime && (
+                            <div><strong>Arrival Time:</strong> {flightData.arrivalTime}</div>
+                        )}
+                        {flightData.duration && (
+                            <div><strong>Duration:</strong> {flightData.duration}</div>
+                        )}
+                        {flightData.airplane && (
+                            <div><strong>Aircraft:</strong> {flightData.airplane}</div>
+                        )}
+                        {flightData.legroom && (
+                            <div><strong>Legroom:</strong> {flightData.legroom}</div>
+                        )}
+                        {typeof flightData.stops !== 'undefined' && flightData.stops !== null && (
+                            <div><strong>Stops:</strong> {flightData.stops === 0 ? 'Nonstop' : String(flightData.stops)}</div>
+                        )}
+                    </div>
+                    
+                    <button className='rounded bg-blue-950 border-blue-700 border-2 hover:bg-blue-800 text-white px-4 py-2 mt-4'>Proceed to Checkout</button>
                     <div>
                         <strong>Goal:</strong>
                         <div>* If you select a flight with connecting flights, instead of showing the Proceed to Checkout button, display "Next Flight" button that when clicked shows details of the next flight.</div>

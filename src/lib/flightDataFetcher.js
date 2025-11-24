@@ -32,16 +32,27 @@ export function normalizeSerpData(data) {
                 let flightKey = leg.flight_number || '';
                 flightKey = flightKey.replace(/\s+/g, '_').toLowerCase();
                 
+                // Convert duration from minutes to readable format
+                const durationMinutes = leg.duration || 0;
+                const hours = Math.floor(durationMinutes / 60);
+                const minutes = durationMinutes % 60;
+                const durationFormatted = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+                
                 segments.push({
                     flight_number: leg.flight_number,
                     id: flightKey,
                     airline: leg.airline,
-                    airline_logo: leg.airline_logo,
+                    airlineLogo: leg.airline_logo,
                     airplane: leg.airplane,
-                    departureAirport: leg?.departure_airport?.name,
-                    departureId: leg?.departure_airport?.id,
-                    arrivalAirport: leg?.arrival_airport?.name,
-                    arrivalId: leg?.arrival_airport?.id,
+                    departureAirportName: leg.departure_airport?.name,
+                    departureId: leg.departure_airport?.id,
+                    departureTime: leg.departure_airport?.time,
+                    arrivalAirportName: leg.arrival_airport?.name,
+                    arrivalId: leg.arrival_airport?.id,
+                    arrivalTime: leg.arrival_airport?.time,
+                    duration: durationFormatted,
+                    legroom: leg.legroom,
+                    stops: itin.flights?.length > 1 ? itin.flights.length - 1 : 0,
                     price
                 });
             }
@@ -51,27 +62,10 @@ export function normalizeSerpData(data) {
 }
 
 export function extractFlightData(flight) {
-    const airline = flight?.airline || "";
-    const airlineLogo = flight?.airline_logo || flight?.airlineLogo || "";
-    const airplane = flight?.airplane || "";
-    const departureAirportName = flight?.departureAirport ?? flight?.departure_airport?.name ?? "";
-    const departureId = flight?.departureId ?? flight?.departure_airport?.id ?? "";
-    const arrivalAirportName = flight?.arrivalAirport ?? flight?.arrival_airport?.name ?? "";
-    const arrivalId = flight?.arrivalId ?? flight?.arrival_airport?.id ?? "";
-    const price = flight?.price || "N/A";
-
-    const numericPrice = Number(String(price).replace(/[^0-9.-]+/g, ''));
-    const formattedPrice = Number.isFinite(numericPrice) ? numericPrice.toLocaleString() : price;
-
+    const numericPrice = Number(String(flight?.price || 0).replace(/[^0-9.-]+/g, ''));
+    
     return {
-        airline,
-        airlineLogo,
-        airplane,
-        departureAirportName,
-        departureId,
-        arrivalAirportName,
-        arrivalId,
-        price,
-        formattedPrice
+        ...flight,
+        formattedPrice: Number.isFinite(numericPrice) ? numericPrice.toLocaleString() : flight?.price || "N/A"
     };
 }

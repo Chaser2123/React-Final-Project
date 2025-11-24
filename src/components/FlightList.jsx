@@ -35,6 +35,21 @@ export default function FlightList({ flightsList }) {
                             {flightData.arrivalAirportName || flightData.arrivalId ? (
                                 <div className="flex"><FaPlaneArrival className="inline mr-2" /> <span><strong>Arrival Airport:</strong> {flightData.arrivalAirportName} <span className="text-xs">({flightData.arrivalId})</span></span></div>
                             ) : null}
+                            
+                            <div className="text-sm text-gray-600 mt-2">
+                                {flightData.departureTime && flightData.arrivalTime && (
+                                    <div className="flex justify-between">
+                                        <span><strong>Departs:</strong> {flightData.departureTime}</span>
+                                        <span><strong>Arrives:</strong> {flightData.arrivalTime}</span>
+                                    </div>
+                                )}
+                                {flightData.duration && (
+                                    <div><strong>Duration:</strong> {flightData.duration}</div>
+                                )}
+                                {typeof flightData.stops !== 'undefined' && flightData.stops !== null && (
+                                    <div><strong>Stops:</strong> {flightData.stops === 0 ? 'Nonstop' : String(flightData.stops)}</div>
+                                )}
+                            </div>
                         </div>
                     </Link>
                 );

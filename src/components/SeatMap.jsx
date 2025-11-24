@@ -146,7 +146,7 @@ export default function SeatMap({ flightRowsCount, seatsPerRow, seatCost, onTota
               return (
                 <div key={i} className="flex items-center gap-2">
                   <span className="w-8"></span>
-                  <div className="bg-gray-600 text-white flex justify-center items-center py-3 rounded font-semibold text-sm shadow-lg border-2 border-purple-400" style={{ width: `calc(${maxSeatsPerRow} * 2.5rem + ${maxSeatsPerRow - 1} * 0.5rem + 2rem)` }}>
+                  <div className="bg-gray-600 text-white flex justify-center items-center py-2 rounded font-semibold text-sm shadow-lg border-2 border-purple-400" style={{ width: `calc(${maxSeatsPerRow} * 2.5rem + ${maxSeatsPerRow - 1} * 0.5rem + 2rem)` }}>
                     <FaRestroom className="inline mr-2 text-2xl" /><span>LAVATORY</span>
                   </div>
                 </div>

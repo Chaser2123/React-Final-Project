@@ -19,12 +19,32 @@ export default function FlightDetails({ params }) {
             const { flight_number } = resolvedParams;
             setFlightNumber(flight_number);
             
-            const flights = await fetchAndNormalizeFlights();
+            // Try to get flights from localStorage first
+            let flights = [];
+            const savedFlights = localStorage.getItem('flightSearchResults');
+            if (savedFlights) {
+                try {
+                    flights = JSON.parse(savedFlights);
+                    console.log('Loaded flights from localStorage:', flights);
+                } catch (e) {
+                    console.error('Failed to parse saved flights:', e);
+                }
+            }
+            
+            // If no flights in localStorage, fetch from API
+            if (flights.length === 0) {
+                console.log('No flights in localStorage, fetching from API...');
+                flights = await fetchAndNormalizeFlights();
+            }
+            
             const foundFlight = flights.find(f => f.id === flight_number || f.flight_number === flight_number);
+            console.log('Looking for flight:', flight_number);
+            console.log('Found flight:', foundFlight);
             
             setFlight(foundFlight);
             if (foundFlight) {
                 const extractedData = extractFlightData(foundFlight);
+                console.log('Extracted flight data:', extractedData);
                 setFlightData(extractedData);
                 
                 // Get seating configuration based on aircraft type

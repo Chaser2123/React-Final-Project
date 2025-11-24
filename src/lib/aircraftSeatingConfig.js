@@ -1,79 +1,108 @@
 // Aircraft seating configurations
-// Based on typical economy class configurations for each aircraft type
-
-export const aircraftSeatingConfig = {
-  // Airbus narrow-body
-  'Airbus A319': { rows: 24, seatsPerRow: 6 },
-  'Airbus A320': { rows: 30, seatsPerRow: 6 },
-  'Airbus A321': { rows: 36, seatsPerRow: 6 },
-  
-  // Airbus wide-body
-  'Airbus A330': { rows: 42, seatsPerRow: 8 },
-  'Airbus A350': { rows: 45, seatsPerRow: 9 },
-  'Airbus A380': { rows: 60, seatsPerRow: 10 },
-  
-  // Boeing narrow-body
-  'Boeing 737': { rows: 29, seatsPerRow: 6 },
-  'Boeing 737MAX 8 Passenger': { rows: 30, seatsPerRow: 6 },
-  'Boeing 737MAX 9 Passenger': { rows: 33, seatsPerRow: 6 },
-  'Boeing 757': { rows: 35, seatsPerRow: 6 },
-  
-  // Boeing wide-body
-  'Boeing 767': { rows: 35, seatsPerRow: 7 },
-  'Boeing 777': { rows: 42, seatsPerRow: 9 },
-  'Boeing 787': { rows: 38, seatsPerRow: 9 },
-  
-  // Embraer
-  'Embraer 175': { rows: 20, seatsPerRow: 4 },
-  'Embraer 190': { rows: 25, seatsPerRow: 4 },
-  
-  // Airbus A220 (formerly Bombardier C Series)
-  'Airbus A220-300 Passenger': { rows: 30, seatsPerRow: 5 },
-  
-  // Default fallback
-  'default': { rows: 30, seatsPerRow: 6 }
-};
+// Dynamically determines seating based on aircraft type from SERP API
 
 /**
  * Get seating configuration for a given aircraft type
- * @param {string} aircraftType - The aircraft type/model
+ * @param {string} aircraftType - The aircraft type/model from SERP API
  * @returns {Object} Configuration with rows and seatsPerRow
  */
 export function getSeatingConfig(aircraftType) {
   if (!aircraftType) {
-    return aircraftSeatingConfig.default;
+    return { rows: 30, seatsPerRow: 6 }; // Default narrow-body
   }
   
-  // Try exact match first
-  if (aircraftSeatingConfig[aircraftType]) {
-    return aircraftSeatingConfig[aircraftType];
+  const type = aircraftType.toLowerCase();
+  
+  // Regional jets (small aircraft, 2-2 seating)
+  if (type.includes('embraer') || type.includes('crj') || type.includes('erj')) {
+    return { rows: 20, seatsPerRow: 4 };
   }
   
-  // Try partial match for aircraft families
-  const normalizedType = aircraftType.toLowerCase();
-  
-  if (normalizedType.includes('737')) {
-    return aircraftSeatingConfig['Boeing 737'];
-  } else if (normalizedType.includes('787')) {
-    return aircraftSeatingConfig['Boeing 787'];
-  } else if (normalizedType.includes('777')) {
-    return aircraftSeatingConfig['Boeing 777'];
-  } else if (normalizedType.includes('767')) {
-    return aircraftSeatingConfig['Boeing 767'];
-  } else if (normalizedType.includes('a320') || normalizedType.includes('airbus a320')) {
-    return aircraftSeatingConfig['Airbus A320'];
-  } else if (normalizedType.includes('a319')) {
-    return aircraftSeatingConfig['Airbus A319'];
-  } else if (normalizedType.includes('a321')) {
-    return aircraftSeatingConfig['Airbus A321'];
-  } else if (normalizedType.includes('a350')) {
-    return aircraftSeatingConfig['Airbus A350'];
-  } else if (normalizedType.includes('a330')) {
-    return aircraftSeatingConfig['Airbus A330'];
-  } else if (normalizedType.includes('embraer')) {
-    return aircraftSeatingConfig['Embraer 175'];
+  // Wide-body aircraft (twin aisle, typically 2-4-2 or 3-3-3 seating)
+  if (type.includes('787') || type.includes('777') || type.includes('767') || 
+      type.includes('a330') || type.includes('a340') || type.includes('a350') || 
+      type.includes('a380')) {
+    return { rows: 40, seatsPerRow: 9 }; // Typical wide-body
   }
   
-  // Return default if no match
-  return aircraftSeatingConfig.default;
+  // Narrow-body aircraft (single aisle, 3-3 seating) - most common
+  // Covers 737, A320 family, 757, A220, etc.
+  return { rows: 30, seatsPerRow: 6 };
+}
+
+/**
+ * Generate facility positions (emergency exits and lavatories) based on aircraft configuration
+ * @param {string} aircraftType - The aircraft type/model
+ * @returns {Object} Object containing arrays of emergency exits and lavatories with their positions
+ */
+export function generateFacilities(aircraftType) {
+  const config = getSeatingConfig(aircraftType);
+  const { rows } = config;
+  
+  console.log('Generating facilities for aircraft with', rows, 'rows');
+  
+  const lavatoryPositions = [];
+  const emergencyExitPositions = [];
+  
+  // Helper to add positions at specified row ratios
+  const addPositions = (positions, rowRatios) => {
+    rowRatios.forEach(ratio => {
+      // Convert fractional ratios to actual row numbers
+      const row = ratio < 1 && ratio > 0 ? Math.floor(rows * ratio) : ratio;
+      positions.push({ row, position: 'after' });
+    });
+  };
+  
+  // Determine lavatory positions based on aircraft size
+  if (rows <= 20) {
+    // Small aircraft: front and rear lavatories
+    addPositions(lavatoryPositions, [2, rows]);
+  } else if (rows <= 35) {
+    // Medium aircraft: front, middle, and rear
+    addPositions(lavatoryPositions, [3, Math.floor(rows / 2) + 2, rows]);
+  } else {
+    // Large aircraft: multiple throughout
+    addPositions(lavatoryPositions, [3, Math.floor(rows * 0.25), Math.floor(rows * 0.5), Math.floor(rows * 0.75), rows]);
+  }
+  
+  // Determine emergency exit positions based on aircraft size
+  emergencyExitPositions.push({ row: 0, position: 'before' }); // Front exit
+  
+  if (rows <= 20) {
+    // Small aircraft: one overwing exit
+    addPositions(emergencyExitPositions, [0.5]);
+  } else if (rows <= 35) {
+    // Medium aircraft: two overwing exits
+    addPositions(emergencyExitPositions, [0.4, 0.6]);
+  } else {
+    // Large aircraft: multiple door pairs
+    addPositions(emergencyExitPositions, [0.25, 0.45, 0.65, 0.85]);
+  }
+  
+  addPositions(emergencyExitPositions, [rows]); // Rear exit
+  
+  console.log('Lavatory positions:', lavatoryPositions);
+  console.log('Exit positions:', emergencyExitPositions);
+  
+  // Format facility objects for seatmap rendering
+  const facilities = [
+    ...lavatoryPositions.map(lav => ({
+      code: 'LAV',
+      coordinates: {
+        x: 0,
+        y: lav.row
+      },
+      position: lav.position
+    })),
+    ...emergencyExitPositions.map(exit => ({
+      code: 'EXIT',
+      coordinates: {
+        x: 0,
+        y: exit.row
+      },
+      position: exit.position
+    }))
+  ];
+  
+  return facilities;
 }

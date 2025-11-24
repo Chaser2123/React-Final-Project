@@ -1,8 +1,7 @@
 "use client";
 import FlightSearchForm from "@/pages/BookFlight/FlightSearchForm";
 import FlightList from "../../components/FlightList.jsx";
-import { fetchAndNormalizeFlights, normalizeSerpData } from "@/lib/flightDataFetcher";
-import serpFallback from "../../../SERPAPI_SEARHES.json";
+import { normalizeSerpData } from "@/lib/flightDataFetcher";
 import { useState, useEffect } from "react";
 
 // Chases's Code that was conflicted 
@@ -13,7 +12,7 @@ export default function Home() {
   const [flights, setFlights] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Load saved flights from localStorage on mount
+  // Load saved flights on mount
   useEffect(() => {
     const savedFlights = localStorage.getItem('flightSearchResults');
     if (savedFlights) {
@@ -26,32 +25,31 @@ export default function Home() {
   }, []);
 
   const searchFlights = async (departure, arrival, outbound, returnd) => {
+    console.log('Search clicked with:', { departure, arrival, outbound, returnd });
     setLoading(true);
     try {
-      const API_KEY = process.env.NEXT_PUBLIC_SERP_API_KEY;
-      let data;
+      // Use /api route to keep API key secure on server side
+      const url = `/api/flights?departure_id=${departure}&arrival_id=${arrival}&outbound_date=${outbound}&return_date=${returnd}`;
+      console.log('Fetching from:', url);
+      const response = await fetch(url, { cache: 'no-store' });
       
-      if (API_KEY) {
-        try {
-          const url = `https://serpapi.com/search.json?engine=google_flights&departure_id=${departure}&arrival_id=${arrival}&outbound_date=${outbound}&return_date=${returnd}&currency=USD&hl=en&api_key=${API_KEY}`;
-          const response = await fetch(url, { cache: 'no-store' });
-          if (!response.ok) throw new Error(`SERP API error ${response.status}`);
-          data = await response.json();
-        } catch (e) {
-          console.error('SERP API failed, using fallback JSON:', e.message);
-          data = serpFallback;
-        }
-      } else {
-        data = serpFallback;
-        alert('SERP API key is missing. Using fallback data.');
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('API error:', errorData);
+        throw new Error(`SERP API error ${response.status}: ${errorData.error || 'Unknown error'}`);
       }
-
+      
+      const data = await response.json();
+      console.log('Raw API data:', data);
       const normalizedFlights = normalizeSerpData(data);
+      console.log('Normalized flights:', normalizedFlights);
       setFlights(normalizedFlights);
-      // Save flights to localStorage
       localStorage.setItem('flightSearchResults', JSON.stringify(normalizedFlights));
     } catch (error) {
       console.error('Search failed:', error);
+      alert('Failed to search flights. Please try again. Error: ' + error.message);
     } finally {
       setLoading(false);
     }

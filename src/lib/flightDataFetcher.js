@@ -1,5 +1,5 @@
 export async function fetchAndNormalizeFlights() {
-    const API_KEY = process.env.API_KEY || process.env.SERP_API_KEY || process.env.NEXT_PUBLIC_SERP_API_KEY;
+    const API_KEY = process.env.NEXT_PUBLIC_SERP_API_KEY;
 
     if (!API_KEY) {
         console.error('SERP API key is missing');

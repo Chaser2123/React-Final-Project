@@ -4,30 +4,78 @@
 /**
  * Get seating configuration for a given aircraft type
  * @param {string} aircraftType - The aircraft type/model from SERP API
- * @returns {Object} Configuration with rows and seatsPerRow
+ * @returns {Object} Configuration with rows and class-based seating
  */
 export function getSeatingConfig(aircraftType) {
   if (!aircraftType) {
-    return { rows: 30, seatsPerRow: 6 }; // Default narrow-body
+    return { 
+      rows: 30, 
+      seatsPerRow: 6,
+      classes: [
+        { name: 'First', rows: 2, seatsPerRow: 4 },
+        { name: 'Business', rows: 6, seatsPerRow: 4 },
+        { name: 'Premium Economy', rows: 6, seatsPerRow: 6 },
+        { name: 'Economy', rows: 16, seatsPerRow: 6 }
+      ]
+    };
   }
   
   const type = aircraftType.toLowerCase();
   
   // Regional jets (small aircraft, 2-2 seating)
   if (type.includes('embraer') || type.includes('crj') || type.includes('erj')) {
-    return { rows: 20, seatsPerRow: 4 };
+    return { 
+      rows: 20, 
+      seatsPerRow: 4,
+      classes: [
+        { name: 'First', rows: 2, seatsPerRow: 2 },
+        { name: 'Economy', rows: 18, seatsPerRow: 4 }
+      ]
+    };
   }
   
   // Wide-body aircraft (twin aisle, typically 2-4-2 or 3-3-3 seating)
   if (type.includes('787') || type.includes('777') || type.includes('767') || 
       type.includes('a330') || type.includes('a340') || type.includes('a350') || 
       type.includes('a380')) {
-    return { rows: 40, seatsPerRow: 9 }; // Typical wide-body
+    return { 
+      rows: 40, 
+      seatsPerRow: 9,
+      classes: [
+        { name: 'First', rows: 3, seatsPerRow: 4 },
+        { name: 'Business', rows: 10, seatsPerRow: 6 },
+        { name: 'Premium Economy', rows: 8, seatsPerRow: 8 },
+        { name: 'Economy', rows: 19, seatsPerRow: 9 }
+      ]
+    };
   }
   
   // Narrow-body aircraft (single aisle, 3-3 seating) - most common
-  // Covers 737, A320 family, 757, A220, etc.
-  return { rows: 30, seatsPerRow: 6 };
+  // Covers 737, A320 family (including A321neo), 757, A220, etc.
+  if (type.includes('a321')) {
+    // Airbus A321neo specific configuration
+    return { 
+      rows: 32, 
+      seatsPerRow: 6,
+      classes: [
+        { name: 'First', rows: 2, seatsPerRow: 4 },
+        { name: 'Business', rows: 6, seatsPerRow: 6 },
+        { name: 'Premium Economy', rows: 6, seatsPerRow: 6 },
+        { name: 'Economy', rows: 18, seatsPerRow: 6 }
+      ]
+    };
+  }
+  
+  return { 
+    rows: 30, 
+    seatsPerRow: 6,
+    classes: [
+      { name: 'First', rows: 2, seatsPerRow: 4 },
+      { name: 'Business', rows: 6, seatsPerRow: 4 },
+      { name: 'Premium Economy', rows: 6, seatsPerRow: 6 },
+      { name: 'Economy', rows: 16, seatsPerRow: 6 }
+    ]
+  };
 }
 
 /**

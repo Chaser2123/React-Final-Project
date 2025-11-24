@@ -129,6 +129,7 @@ export default function FlightDetails({ params }) {
                 origin={flightData.departureId}
                 destination={flightData.arrivalId}
                 aircraftType={flightData.airplane}
+                seatingConfig={seatingConfig}
             />
             </div>
         </div>

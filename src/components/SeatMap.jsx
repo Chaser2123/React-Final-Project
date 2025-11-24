@@ -27,11 +27,17 @@ export default function SeatMap({ flightRowsCount, seatsPerRow, seatCost, onTota
   useEffect(() => {
     setSeatmapData(generateSeatmapData(aircraftType, flightRowsCount, seatsPerRow));
   }, [aircraftType, flightRowsCount, seatsPerRow]);
+  const flightClasses = ['Economy'];
+  if (flightRowsCount > 20) flightClasses.push('Premium Economy');
+  if (flightRowsCount > 30) flightClasses.push('Business');
+  flightClasses.push('First');
+  
 
   const handleSeatClick = (seatId) => {
     setSelectedSeats(prev => {
       const updated = new Set(prev);
       updated.has(seatId) ? updated.delete(seatId) : updated.add(seatId);
+      
       onTotalCostChange?.(updated.size * seatCost);
       return updated;
     });

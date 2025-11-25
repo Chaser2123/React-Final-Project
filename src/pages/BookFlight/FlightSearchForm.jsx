@@ -22,7 +22,7 @@ export default function FlightSearchForm({ defaults = {}, onSearch }) {
       <FlightSearchParam label="Outbound date" type="date" value={outbound} onChange={(e) => setOutbound(e.target.value)} />
       <FlightSearchParam label="Return date" type="date" value={returnd} onChange={(e) => setReturnd(e.target.value)} />
 
-      <div className="sm:col-span-2 mt-2 flex gap-2">
+      <div className="sm:col-span-2 mt-2 flex gap-2 justify-center">
         <button type="submit" className="rounded bg-indigo-400 px-4 py-2 text-sm font-medium text-background disabled:opacity-60">Search</button>
       </div>
     </form>

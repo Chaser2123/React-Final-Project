@@ -43,14 +43,33 @@ export default function AuthProvider({ children }) {
             if (cancelled) return;
             unsub = onAuthStateChanged(auth, async (user) => {
                 if (user) {
-                    // Immediately reflect signed-in state with provisional user to avoid UI flicker
                     setIsAuthorized(true);
                     setUserRole('user');
-                    // Try to derive names from Firebase Auth profile instantly
                     const display = (user.displayName || '').trim();
                     const [firstNameFromAuth, ...rest] = display ? display.split(' ') : [''];
                     const lastNameFromAuth = rest.length ? rest.join(' ') : '';
                     setCurrentUser({ role: 'user', firstName: firstNameFromAuth || '', lastName: lastNameFromAuth || '', uid: user.uid, email: user.email || '' });
+                    // Check if this is a new user just signed up
+                    let newUserData = null;
+                    try {
+                        newUserData = JSON.parse(window.localStorage.getItem('newUserJustSignedUp'));
+                    } catch {}
+                    if (newUserData && newUserData.uid === user.uid) {
+                        // Write user profile to Firestore
+                        try {
+                            await setDoc(doc(db, 'users', user.uid), {
+                                email: newUserData.email,
+                                firstName: newUserData.firstName,
+                                lastName: newUserData.lastName,
+                                role: newUserData.role,
+                                createdAt: serverTimestamp(),
+                            }, { merge: true });
+                        } catch (e) {
+                            // eslint-disable-next-line no-console
+                            console.warn('Failed to write new user profile to Firestore', e);
+                        }
+                        window.localStorage.removeItem('newUserJustSignedUp');
+                    }
                     try {
                         const profileRef = doc(db, "users", user.uid);
                         const snap = await getDoc(profileRef);

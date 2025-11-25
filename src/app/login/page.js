@@ -118,13 +118,14 @@ export default function LoginPage() {
           try {
             primeAuthUser && primeAuthUser(cred.user, { firstName, lastName, role: 'user' });
           } catch {}
-          await setDoc(doc(db, 'users', uid), {
+          // Set a flag in localStorage to indicate a new user just signed up
+          window.localStorage.setItem('newUserJustSignedUp', JSON.stringify({
             email: sanitizedEmail,
             firstName,
             lastName,
             role: 'user',
-            createdAt: serverTimestamp(),
-          }, { merge: true });
+            uid,
+          }));
           router.replace('/');
         })
         .catch((err) => {

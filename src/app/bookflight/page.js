@@ -58,12 +58,12 @@ export default function Home() {
   };
 
   return (
-    <main >
-      <h1 className="text-3xl font-bold underline">Book A Flight!</h1>
-
-      <div className="rounded-md bg-white max-w-3xl p-6 shadow flex">
-        <h2 className="text-lg font-medium text-black">Flight Search Parameters</h2>
-        <FlightSearchForm className="text-slate-900" onSearch={searchFlights} />
+    <main>
+      <div className="w-full flex justify-center my-5">
+        <div className="rounded-md bg-white max-w-3xl p-6 shadow flex flex-col">
+          <h2 className="text-lg font-medium text-black text-center">Flight Search Parameters</h2>
+          <FlightSearchForm className="text-slate-900" onSearch={searchFlights} />
+        </div>
       </div>
 
       <div id="renderLocation"></div>

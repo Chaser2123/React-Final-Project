@@ -31,7 +31,9 @@ export default function UserPage() {
         )
       }
       <div className="p-6 space-y-4 bg-white rounded-2xl shadow-md max-w-3xl mx-auto mt-10">
-        <h1 className="text-2xl font-semibold">Welcome {currentUser?.firstName + ' ' + currentUser?.lastName || 'User'}</h1>
+        <h1 className="text-2xl font-semibold">Welcome, {((currentUser?.firstName || '') + ' ' + (currentUser?.lastName || '')).trim() || 'User'}</h1>
+        <div>Date Joined: {currentUser?.creationTime ? new Date(currentUser.creationTime).toLocaleDateString() : 'N/A'}</div>
+        <div>Last Logged in: {currentUser?.lastSignInTime ? new Date(currentUser.lastSignInTime).toLocaleDateString() : 'N/A'}</div>
         <div>
           <h2 className="text-xl font-medium">Role: {currentUser?.role || 'User'}</h2>
         </div>

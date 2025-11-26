@@ -5,7 +5,7 @@ import { EmailAuthProvider, reauthenticateWithCredential, deleteUser } from "fir
 
 export default function useAuth() {
     const context = useContext(AuthContext);
-
+    const changePassword = 0
     const deleteAccount = async ({ email, password, currentUser, setShowDeleteAccountModal, router }) => {
         if (!email || !password) {
             alert("Please enter both email and password.");

@@ -114,10 +114,7 @@ export default function LoginPage() {
             // eslint-disable-next-line no-console
             console.warn('Failed to set auth displayName', e);
           }
-          // Prime context immediately so header updates instantly
-          try {
-            primeAuthUser && primeAuthUser(cred.user, { firstName, lastName, role: 'user' });
-          } catch {}
+          // Do not prime context here; let onAuthStateChanged handle context update and Firestore fetch
           // Set a flag in localStorage to indicate a new user just signed up
           window.localStorage.setItem('newUserJustSignedUp', JSON.stringify({
             email: sanitizedEmail,

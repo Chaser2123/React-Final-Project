@@ -1,136 +1,129 @@
-'use client'
+'use client';
 
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth, db } from "@/lib/firebase";
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence, updateProfile } from "firebase/auth";
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 
 export const AuthContext = createContext(null);
 
 export default function AuthProvider({ children }) {
-    // Track the current user; default to 'guest' when no user is set
-    const [currentUser, setCurrentUser] = useState('guest');
-    const [isInitializing, setIsInitializing] = useState(true);
-    const [isLoading, setIsLoading] = useState(false);
-    const router = useRouter();
+  const [currentUser, setCurrentUser] = useState("guest");
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [userRole, setUserRole] = useState("");
 
-    // Keep existing flags for backward compatibility
-    const [isAuthorized, setIsAuthorized] = useState(false);
-    const [userRole, setUserRole] = useState("");
+  const router = useRouter();
 
-    // Subscribe to Firebase auth state and load profile from Firestore
-    useEffect(() => {
-        let unsub = () => {};
-        let cancelled = false;
-        (async () => {
-            try {
-                await setPersistence(auth, browserLocalPersistence);
-            } catch (e) {
-                // eslint-disable-next-line no-console
-                console.warn('Failed to set auth persistence; continuing with default.', e);
-            }
-            // Prime immediately from existing session if available to avoid any visual delay
-            const existing = auth.currentUser;
-            if (existing) {
-                const display = (existing.displayName || '').trim();
-                const [firstNameFromAuth, ...rest] = display ? display.split(' ') : [''];
-                const lastNameFromAuth = rest.length ? rest.join(' ') : '';
-                setIsAuthorized(true);
-                setUserRole('user');
-                setCurrentUser({ role: 'user', firstName: firstNameFromAuth || '', lastName: lastNameFromAuth || '', uid: existing.uid, email: existing.email || '' });
-            }
-            if (cancelled) return;
-            unsub = onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    setIsAuthorized(true);
-                    setUserRole('user');
-                    const display = (user.displayName || '').trim();
-                    const [firstNameFromAuth, ...rest] = display ? display.split(' ') : [''];
-                    const lastNameFromAuth = rest.length ? rest.join(' ') : '';
-                    setCurrentUser({ role: 'user', firstName: firstNameFromAuth || '', lastName: lastNameFromAuth || '', uid: user.uid, email: user.email || '' });
-                    // Check if this is a new user just signed up
-                    let newUserData = null;
-                    try {
-                        newUserData = JSON.parse(window.localStorage.getItem('newUserJustSignedUp'));
-                    } catch {}
-                    if (newUserData && newUserData.uid === user.uid) {
-                        // Write user profile to Firestore
-                        try {
-                            await setDoc(doc(db, 'users', user.uid), {
-                                email: newUserData.email,
-                                firstName: newUserData.firstName,
-                                lastName: newUserData.lastName,
-                                role: newUserData.role,
-                                createdAt: serverTimestamp(),
-                            }, { merge: true });
-                        } catch (e) {
-                            // eslint-disable-next-line no-console
-                            console.warn('Failed to write new user profile to Firestore', e);
-                        }
-                        window.localStorage.removeItem('newUserJustSignedUp');
-                    }
-                    try {
-                        const profileRef = doc(db, "users", user.uid);
-                        const snap = await getDoc(profileRef);
-                        const profile = snap.exists() ? snap.data() : {};
-                        const role = profile.role || 'user';
-                        const firstName = profile.firstName || '';
-                        const lastName = profile.lastName || '';
-                        setUserRole(role);
-                        setCurrentUser({ role, firstName, lastName, uid: user.uid, email: user.email });
-                    } catch (e) {
-                        setUserRole('user');
-                        setCurrentUser({ role: 'user', firstName: '', lastName: '', uid: user.uid, email: user.email || '' });
-                    } finally {
-                        setIsInitializing(false);
-                    }
-                } else {
-                    setIsAuthorized(false);
-                    setUserRole("");
-                    setCurrentUser('guest');
-                    setIsInitializing(false);
-                }
-            });
-        })();
-        return () => { cancelled = true; unsub && unsub(); };
-    }, []);
+  // Prevent repeated Firestore profile requests
+  const lastFetchedUid = useRef(null);
 
-    // Login via Firebase Auth
-    const primeAuthUser = (user, overrides = {}) => {
-        if (!user) return;
-        const display = (user.displayName || '').trim();
-        const [firstNameFromAuth, ...rest] = display ? display.split(' ') : [''];
-        const lastNameFromAuth = rest.length ? rest.join(' ') : '';
-        const firstName = overrides.firstName ?? firstNameFromAuth ?? '';
-        const lastName = overrides.lastName ?? lastNameFromAuth ?? '';
-        setIsAuthorized(true);
-        setUserRole(overrides.role || 'user');
-        setCurrentUser({ role: overrides.role || 'user', firstName, lastName, uid: user.uid, email: user.email || '' });
-    };
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        setIsAuthorized(false);
+        setUserRole("");
+        setCurrentUser("guest");
+        setIsInitializing(false);
+        return;
+      }
 
-    const login = async ({ email, password }) => {
-        setIsLoading(true);
+      setIsAuthorized(true);
+
+      // Only fetch profile if it's a new user session
+      if (user.uid !== lastFetchedUid.current) {
+        lastFetchedUid.current = user.uid;
+
         try {
-            const cred = await signInWithEmailAndPassword(auth, email, password);
-            // Prime immediately using available displayName/email
-            primeAuthUser(cred.user);
-            // Don't fetch from Firestore here—let onAuthStateChanged handle it to avoid duplicate requests
-            // that cause NS_BINDING_ABORTED errors
-        } finally {
-            setIsLoading(false);
+          const profileRef = doc(db, "users", user.uid);
+          const snap = await getDoc(profileRef);
+          const profile = snap.exists() ? snap.data() : {};
+          // Fallback to displayName if Firestore names are missing
+          let firstName = profile.firstName || "";
+          let lastName = profile.lastName || "";
+          if (!firstName && user.displayName) {
+            const display = user.displayName.trim();
+            const [first, ...rest] = display ? display.split(' ') : [''];
+            firstName = first;
+            lastName = rest.length ? rest.join(' ') : '';
+          }
+          setUserRole(profile.role || "user");
+          setCurrentUser({
+            uid: user.uid,
+            email: user.email || "",
+            role: profile.role || "user",
+            firstName,
+            lastName,
+            creationTime: user.metadata?.creationTime,
+            lastSignInTime: user.metadata?.lastSignInTime,
+          });
+        } catch (e) {
+          console.warn("Failed to fetch Firestore profile:", e);
+          // Fallback to displayName if available
+          let firstName = "";
+          let lastName = "";
+          if (user.displayName) {
+            const display = user.displayName.trim();
+            const [first, ...rest] = display ? display.split(' ') : [''];
+            firstName = first;
+            lastName = rest.length ? rest.join(' ') : '';
+          }
+          setUserRole("user");
+          setCurrentUser({
+            uid: user.uid,
+            email: user.email || "",
+            role: "user",
+            firstName,
+            lastName,
+            creationTime: user.metadata?.creationTime,
+            lastSignInTime: user.metadata?.lastSignInTime,
+          });
         }
-    };
+      }
 
-    // Logout via Firebase Auth
-    const logout = async () => {
-        await signOut(auth);
-        router.replace('/');
-    };
+      setIsInitializing(false);
+    });
 
-    return (
-        <AuthContext.Provider value={{ currentUser, setCurrentUser, isAuthorized, userRole, isInitializing, isLoading, login, logout, primeAuthUser }}>
-            {children}
-        </AuthContext.Provider>
-    );
+    return () => unsubscribe();
+  }, []);
+
+  // Login function
+  const login = async ({ email, password }) => {
+    setIsLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      // No Firestore fetch here — onAuthStateChanged handles it
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Logout function
+  const logout = async () => {
+    await signOut(auth);
+    router.replace("/");
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        currentUser,
+        isAuthorized,
+        userRole,
+        isInitializing,
+        isLoading,
+        login,
+        logout,
+        setCurrentUser, // optional — useful for onboarding
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }

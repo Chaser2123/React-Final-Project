@@ -23,7 +23,7 @@ export default function UserPage() {
   };
 
   return (
-    <main className="w-full min-h-screen flex flex-col justify-start items-center fixed bg-image bg-cover bg-center bg-[url('@/images/airport.jpg')]">
+    <main className="w-full min-h-screen flex flex-col justify-start items-center fixed bg-image bg-cover bg-center bg-[url('@/images/chicago.jpg')]">
       {showDeleteAccountModal === 1 && (
         <DeleteAccountModal setShowDeleteAccountModal={setShowDeleteAccountModal} handleDeleteAccount={handleDeleteAccount}/>
       )}
@@ -32,7 +32,7 @@ export default function UserPage() {
           <ChangePasswordModal setShowChangePasswordModal={setShowChangePasswordModal} />
         )
       }
-      <div className="p-6 space-y-4 bg-white rounded-2xl shadow-md max-w-3xl mx-auto mt-10">
+      <div className="p-6 space-y-4 bg-white/90 rounded-2xl border-4 border-purple-700 shadow-md w-220 mx-auto mt-10">
         <h1 className="text-2xl font-semibold">Welcome, {((currentUser?.firstName || '') + ' ' + (currentUser?.lastName || '')).trim() || 'User'}</h1>
         <div>Date Joined: {currentUser?.creationTime ? new Date(currentUser.creationTime).toLocaleDateString() : 'N/A'}</div>
         <div>Last Logged in: {currentUser?.lastSignInTime ? new Date(currentUser.lastSignInTime).toLocaleDateString() : 'N/A'}</div>

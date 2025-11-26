@@ -41,7 +41,7 @@ function generateSeatmapData(aircraftType, seatingConfig) {
   return { facilities, seats, rows: currentRow - 1, classInfo };
 }
 
-export default function SeatMap({ flightRowsCount, seatsPerRow, seatCost, onTotalCostChange, aircraftType, seatingConfig }) {
+export default function SeatMap({ flightRowsCount, seatsPerRow, seatCost, onTotalCostChange, onSelectedSeatsChange, aircraftType, seatingConfig }) {
   const [selectedSeats, setSelectedSeats] = useState(new Set());
   const [seatmapData, setSeatmapData] = useState(null);
 
@@ -60,8 +60,8 @@ export default function SeatMap({ flightRowsCount, seatsPerRow, seatCost, onTota
     setSelectedSeats(prev => {
       const updated = new Set(prev);
       updated.has(seatId) ? updated.delete(seatId) : updated.add(seatId);
-      
       onTotalCostChange?.(updated.size * seatCost);
+      onSelectedSeatsChange?.(updated);
       return updated;
     });
   };

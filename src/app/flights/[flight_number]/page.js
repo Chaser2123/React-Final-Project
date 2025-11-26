@@ -12,6 +12,7 @@ export default function FlightDetails({ params }) {
     const [totalCost, setTotalCost] = useState(0);
     const [flightNumber, setFlightNumber] = useState(null);
     const [seatingConfig, setSeatingConfig] = useState({ rows: 30, seatsPerRow: 6 });
+    const [selectedSeats, setSelectedSeats] = useState([]);
 
     useEffect(() => {
         async function loadFlight() {
@@ -63,6 +64,15 @@ export default function FlightDetails({ params }) {
     const handleTotalCostChange = (newTotal) => {
         setTotalCost(newTotal);
     };
+
+    const handleSelectedSeatsChange = (seatsSet) => {
+        setSelectedSeats(Array.from(seatsSet));
+    };
+
+    const handleCheckout = () => {
+        console.log('Selected seats:', selectedSeats);
+        console.log('Final price:', totalCost);
+    };
     return (
         <div>
             <h1 className="text-white text-3xl font-bold text-center my-4">Flight Details for {flightNumber}</h1>
@@ -105,7 +115,7 @@ export default function FlightDetails({ params }) {
                         )}
                     </div>
                     
-                    <button className='rounded bg-blue-950 border-blue-700 border-2 hover:bg-blue-800 text-white px-4 py-2 mt-4'>Proceed to Checkout</button>
+                    <button className='rounded bg-blue-950 border-blue-700 border-2 hover:bg-blue-800 text-white px-4 py-2 mt-4' onClick={handleCheckout}>Proceed to Checkout</button>
                     <div>
                         <strong>Goal:</strong>
                         <div>* If you select a flight with connecting flights, instead of showing the Proceed to Checkout button, display "Next Flight" button that when clicked shows details of the next flight.</div>
@@ -125,6 +135,7 @@ export default function FlightDetails({ params }) {
                 seatsPerRow={seatingConfig.seatsPerRow}
                 seatCost={seatCost}
                 onTotalCostChange={handleTotalCostChange}
+                onSelectedSeatsChange={handleSelectedSeatsChange}
                 departureDate={flightData.departureDate || '2025-12-25'}
                 origin={flightData.departureId}
                 destination={flightData.arrivalId}

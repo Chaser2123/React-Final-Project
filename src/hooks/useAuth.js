@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { AuthContext } from "@/context/AuthContext.jsx";
 import { auth } from "@/lib/firebase";
-import { EmailAuthProvider, reauthenticateWithCredential, deleteUser } from "firebase/auth";
+import { EmailAuthProvider, reauthenticateWithCredential, deleteUser, updatePassword } from "firebase/auth";
 
 export default function useAuth() {
     const context = useContext(AuthContext);
@@ -64,7 +64,7 @@ export default function useAuth() {
 
         try {
             await reauthenticate(email, oldPassword);
-            await auth.currentUser.updatePassword(newPassword);
+            await updatePassword(auth.currentUser, newPassword);
                 completeAction(setShowChangePasswordModal, "Password Change Successful!");
         } catch (error) {
             handleAuthErrors(error, "change password");

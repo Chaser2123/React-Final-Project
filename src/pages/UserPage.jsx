@@ -29,7 +29,7 @@ export default function UserPage() {
       )}
       {
         showChangePasswordModal === 1 && (
-          <ChangePasswordModal setShowChangePasswordModal={setShowChangePasswordModal} />
+          <ChangePasswordModal setShowChangePasswordModal={setShowChangePasswordModal} currentUser={currentUser} />
         )
       }
       <div className="p-6 space-y-4 bg-white/90 rounded-2xl border-4 border-purple-700 shadow-md w-220 mx-auto mt-10">

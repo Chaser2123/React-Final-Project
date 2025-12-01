@@ -1,8 +1,11 @@
-export default function ModalInput({ value, type = "text" }) {
+export default function ModalInput({ value, onChange, type = "text", placeholder }) {
   return (
-    <div>
-      <label htmlFor={value}>{value}</label>
-      <input type={type} id={value} className="border-2 ml-2" />
-    </div>
+    <input
+      type={type}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      className="border-2 ml-2 w-full px-2 py-1 rounded"
+    />
   );
 }

@@ -1,5 +1,5 @@
 
-import ClickerButton from '@/components/ClickerButton';
+import ClickerButton from '@/components/ClickerButton.jsx';
 export default function Dashboard() {
     
     return (

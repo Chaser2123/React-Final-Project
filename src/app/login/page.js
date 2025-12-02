@@ -17,7 +17,7 @@ import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login: authLogin, primeAuthUser, isLoading: authIsLoading } = useAuth() || {}; // handle null context gracefully
+  const { login: authLogin, signup, isLoading: authIsLoading } = useAuth() || {}; // handle null context gracefully
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toggle, setToggle] = useState(0);
   const [form, setForm] = useState({
@@ -102,29 +102,9 @@ export default function LoginPage() {
       }
       setIsSubmitting(true);
       const sanitizedEmail = email.trim();
-      createUserWithEmailAndPassword(auth, sanitizedEmail, password)
-        .then(async (cred) => {
-          const uid = cred.user.uid;
-          try {
-            const fullName = [firstName, lastName].filter(Boolean).join(' ').trim();
-            if (fullName) {
-              await updateProfile(cred.user, { displayName: fullName });
-            }
-          } catch (e) {
-            // eslint-disable-next-line no-console
-            console.warn('Failed to set auth displayName', e);
-          }
-          // Do not prime context here; let onAuthStateChanged handle context update and Firestore fetch
-          // Set a flag in localStorage to indicate a new user just signed up
-          window.localStorage.setItem('newUserJustSignedUp', JSON.stringify({
-            email: sanitizedEmail,
-            firstName,
-            lastName,
-            role: 'user',
-            uid,
-          }));
-          router.replace('/');
-        })
+      // Use useAuth.js signup function to create user and Firestore profile
+      signup({ email: sanitizedEmail, password, firstName, lastName })
+        .then(() => router.replace('/'))
         .catch((err) => {
           console.error('Signup error raw:', err);
           const friendly = firebaseErrorMap[err.code] || err.message || 'Failed to sign up.';

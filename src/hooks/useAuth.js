@@ -4,6 +4,48 @@ import { auth } from "@/lib/firebase";
 import { EmailAuthProvider, reauthenticateWithCredential, deleteUser, updatePassword } from "firebase/auth";
 
 export default function useAuth() {
+            // Signup function: creates user and Firestore profile
+            const signup = async ({ email, password, firstName, lastName }) => {
+                const { createUserWithEmailAndPassword } = await import("firebase/auth");
+                const { db } = await import("@/lib/firebase");
+                const { doc, setDoc } = await import("firebase/firestore");
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    // Create Firestore user profile
+                    await setDoc(doc(db, "users", user.uid), {
+                        email,
+                        role: "user",
+                        firstName,
+                        lastName,
+                    });
+                    alert("Account created successfully!");
+                } catch (error) {
+                    handleAuthErrors(error, "signup");
+                }
+            };
+        // Role Change Request functionality
+        // Secure Role Change Request: Only submits a request, never changes role
+        const requestRoleChange = async ({ currentUser, requestedRole }) => {
+            if (!requestedRole) return;
+            console.log("Current user in requestRoleChange:", currentUser);
+            try {
+                const { db } = await import("@/lib/firebase");
+                const { collection, addDoc, serverTimestamp } = await import("firebase/firestore");
+                await addDoc(collection(db, "roleRequests"), {
+                    uid: currentUser?.uid,
+                    email: currentUser?.email,
+                    currentRole: currentUser?.role,
+                    requestedRole,
+                    status: "pending",
+                    requestedAt: serverTimestamp(),
+                });
+                alert("Role change request submitted! An admin will review your request.");
+            } catch (e) {
+                alert("Failed to submit role change request.");
+                console.error(e);
+            }
+        };
     const context = useContext(AuthContext);
     // Shared helper functions
     const ensureFields = (fields) => {
@@ -92,5 +134,5 @@ export default function useAuth() {
         }
     };
 
-    return { ...context, changePassword, deleteAccount };
+    return { ...context, changePassword, deleteAccount, requestRoleChange, signup };
 }

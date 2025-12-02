@@ -5,10 +5,6 @@ import LoadingScreen from "../../components/LoadingScreen.jsx";
 import { normalizeSerpData } from "@/lib/flightDataFetcher";
 import { useState, useEffect } from "react";
 
-// Chases's Code that was conflicted 
-// export default asnc function Home(){ 
-//   const flights = await fetchAndNormalizeFlights();}
-
 export default function Home() {
   const [flights, setFlights] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -27,10 +23,9 @@ export default function Home() {
 
   const searchFlights = async (departure, arrival, outbound, returnd) => {
     console.log('Search clicked with:', { departure, arrival, outbound, returnd });
-    setFlights([]); // Clear existing tickets
+    setFlights([]); 
     setLoading(true);
     try {
-      // Use /api route to keep API key secure on server side
       const url = `/api/flights?departure_id=${departure}&arrival_id=${arrival}&outbound_date=${outbound}&return_date=${returnd}`;
       console.log('Fetching from:', url);
       const response = await fetch(url, { cache: 'no-store' });

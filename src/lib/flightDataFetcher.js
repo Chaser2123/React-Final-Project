@@ -24,21 +24,23 @@ export function normalizeSerpData(data) {
         ...(Array.isArray(data?.other_flights) ? data.other_flights : [])
     ];
 
-    const segments = [];
+    // Use variable names from FlightSearchFunction.jsx
+    const flightList = [];
     for (const itin of itineraries) {
         const price = itin.price;
+        const flightRouteList = [];
         if (Array.isArray(itin.flights)) {
             for (const leg of itin.flights) {
                 let flightKey = leg.flight_number || '';
                 flightKey = flightKey.replace(/\s+/g, '_').toLowerCase();
-                
+
                 // Convert duration from minutes to readable format
                 const durationMinutes = leg.duration || 0;
                 const hours = Math.floor(durationMinutes / 60);
                 const minutes = durationMinutes % 60;
                 const durationFormatted = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
-                
-                segments.push({
+
+                const flightDetails = {
                     flight_number: leg.flight_number,
                     id: flightKey,
                     airline: leg.airline,
@@ -54,11 +56,14 @@ export function normalizeSerpData(data) {
                     legroom: leg.legroom,
                     stops: itin.flights?.length > 1 ? itin.flights.length - 1 : 0,
                     price
-                });
+                };
+                flightRouteList.push(flightDetails);
             }
         }
+        // Push the itinerary (array of flightDetails) and price
+        flightList.push({ flightRouteList, price });
     }
-    return segments;
+    return flightList;
 }
 
 export function extractFlightData(flight) {

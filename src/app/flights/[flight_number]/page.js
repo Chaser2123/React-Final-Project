@@ -31,17 +31,19 @@ export default function FlightDetails({ params }) {
                     console.error('Failed to parse saved flights:', e);
                 }
             }
-            
+
             // If no flights in localStorage, fetch from API
             if (flights.length === 0) {
                 console.log('No flights in localStorage, fetching from API...');
                 flights = await fetchAndNormalizeFlights();
             }
-            
-            const foundFlight = flights.find(f => f.id === flight_number || f.flight_number === flight_number);
+
+            // Flatten all segments from all flights
+            const allSegments = flights.flatMap(flight => Array.isArray(flight?.flightRouteList) ? flight.flightRouteList : []);
+            const foundFlight = allSegments.find(f => f.id === flight_number || f.flight_number === flight_number);
             console.log('Looking for flight:', flight_number);
             console.log('Found flight:', foundFlight);
-            
+
             setFlight(foundFlight);
             if (foundFlight) {
                 const extractedData = extractFlightData(foundFlight);
@@ -50,7 +52,7 @@ export default function FlightDetails({ params }) {
                 console.log('departureAirportName:', extractedData.departureAirportName);
                 console.log('arrivalAirportName:', extractedData.arrivalAirportName);
                 setFlightData(extractedData);
-                
+
                 // Get seating configuration based on aircraft type
                 const config = getSeatingConfig(extractedData.airplane);
                 setSeatingConfig(config);
